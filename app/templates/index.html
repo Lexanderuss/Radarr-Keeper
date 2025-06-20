@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}Startseite - Radarr Cleanup{% endblock %}
+
+{% block head_extra %}
+<style>
+    .start-box {
+        background-color: var(--bg-medium);
+        padding: 2em;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
+    .logs {
+        background-color: var(--bg-medium);
+        border: 1px solid var(--border-color);
+        padding: 1.5em;
+        margin-top: 2em;
+        max-height: 400px;
+        overflow-y: auto;
+        font-size: 0.9em;
+        border-radius: 8px;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="start-box">
+    <h1>Radarr Cleanup Tool</h1>
+    <p>Suchen Sie nach doppelten Filmen und geben Sie Speicherplatz frei.</p>
+    <div style="display: flex; justify-content: center; gap: 1em; margin-top: 1.5em;">
+        <form action="{{ url_for('analyze_movies') }}" method="post">
+            <button type="submit">Analyse starten</button>
+        </form>
+        <a href="{{ url_for('view_blacklist') }}" class="button button-secondary">Blacklist ansehen</a>
+    </div>
+</div>
+
+{% if logs %}
+    <h2 style="margin-top: 2em;">Logs der letzten Aktion</h2>
+    <div class="logs">
+        <pre>{% for line in logs %}{{ line }}{% endfor %}</pre>
+    </div>
+{% endif %}
+{% endblock %}

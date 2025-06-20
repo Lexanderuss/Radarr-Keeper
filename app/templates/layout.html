@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>{% block title %}Radarr Cleanup Tool{% endblock %}</title>
+    <style>
+        :root {
+            --bg-dark: #111827;
+            --bg-medium: #1F2937;
+            --border-color: #374151;
+            --text-light: #F9FAFB;
+            --text-medium: #9CA3AF;
+            --accent-blue: #22d3ee;
+            --accent-blue-hover: #67e8f9;
+            --danger: #f43f5e;
+            --danger-hover: #fb7185;
+            --success: #22c55e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 2em auto;
+            padding: 0 2em;
+        }
+        h1, h2 {
+            color: var(--text-light);
+            margin-bottom: 0.5em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5em;
+        }
+        p { color: var(--text-medium); margin-bottom: 1em; }
+        a { color: var(--accent-blue); text-decoration: none; }
+        a:hover { color: var(--accent-blue-hover); }
+        .button, button {
+            display: inline-block;
+            text-decoration: none;
+            background: var(--accent-blue);
+            color: var(--bg-dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 700;
+            transition: all 0.2s ease-in-out;
+        }
+        .button:hover, button:hover { background-color: var(--accent-blue-hover); transform: translateY(-2px); }
+        .button-secondary { background: var(--bg-medium); color: var(--text-light); border: 1px solid var(--border-color); }
+        .button-secondary:hover { background-color: var(--border-color); }
+        .button-danger { background: var(--danger); color: var(--text-light); }
+        .button-danger:hover { background-color: var(--danger-hover); }
+        .flash {
+            padding: 1.5em; margin-bottom: 1em; border-radius: 8px;
+            border: 1px solid transparent; font-weight: 500;
+        }
+        .flash.error { background-color: rgba(244, 63, 94, 0.2); color: #fda4af; border-color: var(--danger); }
+        .flash.success { background-color: rgba(34, 197, 94, 0.2); color: #86efac; border-color: var(--success); }
+        pre {
+            font-family: "Fira Code", "Courier New", monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+        }
+    </style>
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block title %}Blacklist Verwaltung{% endblock %}
+
+{% block head_extra %}
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5em;
+        background-color: var(--bg-medium);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    th, td {
+        padding: 1em 1.5em;
+        text-align: left;
+    }
+    th {
+        background-color: rgba(0,0,0,0.2);
+        font-weight: 700;
+    }
+    tr { border-bottom: 1px solid var(--border-color); }
+    tr:last-child { border-bottom: none; }
+    tr:hover { background-color: var(--border-color); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>Blacklist Verwaltung</h1>
+    <a href="{{ url_for('index') }}" class="button-secondary">&larr; Zurück zur Startseite</a>
+</div>
+<p>Hier sehen Sie alle Filme, die von diesem Tool gelöscht und auf die Ausschlussliste Ihrer englischen Radarr-Instanz gesetzt wurden.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Titel</th>
+            <th>TMDB ID</th>
+            <th>Aktion</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if exclusions %}
+            {% for item in exclusions %}
+            <tr>
+                <td>{{ item.movieTitle }}</td>
+                <td>{{ item.tmdbId }}</td>
+                <td>
+                    <form action="{{ url_for('delete_from_blacklist', exclusion_id=item.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="button-danger" style="padding: 8px 12px; font-size: 0.9em;" onclick="return confirm('Sicher, dass Sie diesen Film von der Blacklist nehmen wollen? Er könnte erneut heruntergeladen werden.');">Entfernen</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 3em; color: var(--text-medium);">Die Blacklist ist leer.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

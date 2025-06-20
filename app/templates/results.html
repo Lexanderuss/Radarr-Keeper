@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+
+{% block title %}Löschvorschläge ({{ candidates|length }}){% endblock %}
+
+{% block head_extra %}
+<style>
+    .controls {
+        background: var(--bg-medium); padding: 1.5em; margin-bottom: 2em;
+        border-radius: 12px; border: 1px solid var(--border-color);
+        display: flex; flex-wrap: wrap; gap: 1em; align-items: center;
+    }
+    .log-details {
+        background-color: var(--bg-medium); border: 1px solid var(--border-color);
+        border-radius: 8px; margin-bottom: 2em;
+    }
+    .log-details summary {
+        padding: 1em 1.5em; font-weight: 700; color: var(--accent-blue);
+        cursor: pointer; outline: none;
+    }
+    .log-details .logs {
+        padding: 0 1.5em 1.5em 1.5em; background-color: var(--bg-dark);
+        border-top: 1px solid var(--border-color);
+        max-height: 400px; overflow-y: auto;
+    }
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5em;
+    }
+    .movie-card {
+        background: var(--bg-medium); border-radius: 12px; overflow: hidden;
+        display: flex; flex-direction: column; border: 1px solid var(--border-color);
+        transition: all 0.2s ease-in-out; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .movie-card:hover {
+        transform: translateY(-5px); border-color: var(--accent-blue);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 20px rgba(34, 211, 238, 0.2);
+    }
+    .movie-card img {
+        width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover;
+        background-color: var(--bg-dark);
+    }
+    .movie-card .info { padding: 1em; flex-grow: 1; }
+    .movie-card h3 { font-size: 1.1em; margin-bottom: 0.5em; color: var(--text-light); border: none; padding: 0; }
+    .movie-card p { font-size: 0.9em; color: var(--text-medium); margin-bottom: 0.2em; }
+    .quality-de { color: var(--accent-blue); font-weight: bold; }
+    .quality-en { color: var(--danger); }
+    .selection { background: rgba(0,0,0,0.2); }
+    .selection label {
+        display: flex; align-items: center; justify-content: center; gap: 0.75em;
+        font-weight: 500; cursor: pointer; width: 100%; height: 100%;
+        padding: 1em;
+    }
+    .selection input[type="checkbox"] {
+        width: 18px; height: 18px; accent-color: var(--accent-blue);
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Löschvorschläge</h1>
+<p>Es wurden {{ candidates|length }} Filme gefunden, bei denen die deutsche Version eine höhere Qualität hat.</p>
+
+{% if logs %}
+<details class="log-details">
+    <summary>Detailliertes Analyse-Protokoll anzeigen</summary>
+    <div class="logs">
+        <pre>{% for line in logs %}{{ line }}{% endfor %}</pre>
+    </div>
+</details>
+{% endif %}
+
+<form action="{{ url_for('execute_selection') }}" method="post">
+    <div class="controls">
+        <button type="submit" class="button-danger" onclick="return confirm('SIND SIE SICHER? Die ausgewählten Filme werden endgültig gelöscht und auf die Blacklist gesetzt!');">
+            Ausgewählte löschen
+        </button>
+        <button type="button" class="button-secondary" onclick="toggleAll(true)">Alle auswählen</button>
+        <button type="button" class="button-secondary" onclick="toggleAll(false)">Auswahl aufheben</button>
+        <a href="{{ url_for('index') }}" class="button-secondary" style="margin-left: auto;">Abbrechen</a>
+    </div>
+
+    <div class="movie-grid">
+        {% for movie in candidates %}
+        <div class="movie-card">
+            <img src="{{ movie.poster_url }}" onerror="this.onerror=null;this.src='https://via.placeholder.com/240x360.png?text=Kein+Cover';">
+            <div class="info">
+                <h3>{{ movie.title }} ({{ movie.year }})</h3>
+                <p>Deutsch: <span class="quality-de">{{ movie.de_res }}p {% if movie.de_source != 'UNBEKANNT' %}({{ movie.de_source }}){% endif %}</span></p>
+                <p>Englisch: <span class="quality-en">{{ movie.en_res }}p {% if movie.en_source != 'UNBEKANNT' %}({{ movie.en_source }}){% endif %}</span></p>
+            </div>
+            <div class="selection">
+                <label for="cb-{{ movie.en_movie_id }}">
+                    <input 
+                        type="checkbox" 
+                        class="movie-checkbox" 
+                        id="cb-{{ movie.en_movie_id }}"
+                        name="movie_to_delete" 
+                        value="{{ movie.en_movie_id }}|||{{ movie.tmdbId }}|||{{ movie.title }}|||{{ movie.year }}">
+                    Zum Löschen markieren
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</form>
+
+<script>
+    function toggleAll(state) {
+        document.querySelectorAll('.movie-checkbox').forEach(cb => cb.checked = state);
+    }
+</script>
+{% endblock %}
